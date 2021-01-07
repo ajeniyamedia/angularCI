@@ -8,19 +8,12 @@ jobs:
       - image: circleci/node:12-browsers
     steps:
       - checkout
-      - restore_cache:
-          key: angularCI-{{ .Branch }}-{{ checksum "package-lock.json"}}
-      - run: npm install
+
+      - run: yarn install
+
       - save_cache:
           key: angularCI-{{ .Branch }}-{{ checksum "package-lock.json"}}
           paths:
             - "nodes_modules"
-      - run: npm run test
-      - run: npm run build
-      - deploy:
-          command: |
-            ./node_modules/.bin/surge --project ~/angularCI/dist/angularCI --domain angular-circleci.surge.sh
-workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+      - run: yarn ng test --single-run
+      - run: yarn ng build --prod

@@ -2,18 +2,25 @@ version: 2.1
 orbs:
   node: circleci/node@3.0.0
 jobs:
-  build-and-test:
+  build:
     working_directory: ~/angularCI
     docker:
       - image: circleci/node:12-browsers
     steps:
       - checkout
 
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+
       - run: yarn install
 
       - save_cache:
-          key: angularCI-{{ .Branch }}-{{ checksum "package-lock.json"}}
           paths:
-            - "nodes_modules"
-      - run: yarn ng test --single-run
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
       - run: yarn ng build --prod
+      - run: yarn ng test --single-run
+
